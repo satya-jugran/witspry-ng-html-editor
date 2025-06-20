@@ -1,0 +1,116 @@
+<div class="demo-container">
+  <header class="demo-header">
+    <h1>{{ title }}</h1>
+    <p>A demonstration of the Witspry Angular HTML Editor component</p>
+  </header>
+
+  <div class="demo-controls">
+    <div class="control-group">
+      <label for="theme-select">Theme:</label>
+      <select id="theme-select" [(ngModel)]="currentTheme" (change)="changeTheme(currentTheme)">
+        <option *ngFor="let theme of themes" [value]="theme.value">{{ theme.label }}</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="tab-size">Tab Size:</label>
+      <select id="tab-size" [value]="editorConfig.tabSize" (change)="updateTabSize(+$any($event.target).value)">
+        <option value="2">2</option>
+        <option value="4">4</option>
+        <option value="8">8</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="font-size">Font Size:</label>
+      <select id="font-size" [value]="editorConfig.fontSize" (change)="changeFontSize($any($event.target).value)">
+        <option value="12px">12px</option>
+        <option value="14px">14px</option>
+        <option value="16px">16px</option>
+        <option value="18px">18px</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>
+        <input type="checkbox" [checked]="editorConfig.lineNumbers" (change)="toggleLineNumbers()">
+        Line Numbers
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label>
+        <input type="checkbox" [checked]="editorConfig.autoIndent" (change)="toggleAutoIndent()">
+        Auto Indent
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label>
+        <input type="checkbox" [checked]="editorConfig.wordWrap" (change)="toggleWordWrap()">
+        Word Wrap
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label>
+        <input type="checkbox" [checked]="readonly" (change)="toggleReadonly()">
+        Read Only
+      </label>
+    </div>
+  </div>
+
+  <div class="demo-editor">
+    <h2>HTML Editor</h2>
+    <witspry-html-editor
+      [(ngModel)]="htmlContent"
+      [theme]="currentTheme"
+      [config]="editorConfig"
+      [readonly]="readonly"
+      placeholder="Enter your HTML content here..."
+      (contentChange)="onContentChange($event)"
+      (focus)="onEditorFocus()"
+      (blur)="onEditorBlur()">
+    </witspry-html-editor>
+  </div>
+
+  <div class="demo-output">
+    <h2>Raw Content</h2>
+    <pre class="content-display">{{ htmlContent }}</pre>
+  </div>
+
+  <div class="demo-preview">
+    <h2>HTML Preview</h2>
+    <div class="preview-content" [innerHTML]="htmlContent"></div>
+  </div>
+
+  <div class="demo-info">
+    <h2>Features</h2>
+    <ul>
+      <li>✅ HTML Syntax Highlighting</li>
+      <li>✅ Line Numbers</li>
+      <li>✅ Auto-indentation</li>
+      <li>✅ Multiple Themes (Default, Light, Dark)</li>
+      <li>✅ Configurable Tab Size</li>
+      <li>✅ Configurable Font Size</li>
+      <li>✅ Word Wrap Support</li>
+      <li>✅ Read-only Mode</li>
+      <li>✅ NgModel Integration</li>
+      <li>✅ Event Handling (focus, blur, content change)</li>
+    </ul>
+  </div>
+
+  <div class="demo-usage">
+    <h2>Usage Example</h2>
+    <pre class="code-example"><code>&lt;witspry-html-editor
+  [(ngModel)]="htmlContent"
+  [theme]="'dark'"
+  [config]="editorConfig"
+  [readonly]="false"
+  placeholder="Enter HTML content..."
+  (contentChange)="onContentChange($event)"
+  (focus)="onEditorFocus()"
+  (blur)="onEditorBlur()"&gt;
+&lt;/witspry-html-editor&gt;</code></pre>
+  </div>
+</div>

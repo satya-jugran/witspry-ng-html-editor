@@ -1,0 +1,238 @@
+/* HTML Editor Container */
+.html-editor-container {
+  --editor-bg: #ffffff;
+  --editor-text: #333333;
+  --editor-border: #d1d5db;
+  --editor-line-number-bg: #f9fafb;
+  --editor-line-number-text: #6b7280;
+  --editor-selection: #3b82f6;
+  --editor-tag: #dc2626;
+  --editor-attribute: #059669;
+  --editor-string: #7c3aed;
+  --editor-comment: #6b7280;
+  --editor-text-content: #374151;
+  
+  position: relative;
+  border: 1px solid var(--editor-border);
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  background: var(--editor-bg);
+}
+
+/* Theme Variations */
+.html-editor-container[data-theme="dark"] {
+  --editor-bg: #1f2937;
+  --editor-text: #f9fafb;
+  --editor-border: #374151;
+  --editor-line-number-bg: #111827;
+  --editor-line-number-text: #9ca3af;
+  --editor-selection: #3b82f6;
+  --editor-tag: #f87171;
+  --editor-attribute: #34d399;
+  --editor-string: #a78bfa;
+  --editor-comment: #9ca3af;
+  --editor-text-content: #d1d5db;
+}
+
+.html-editor-container[data-theme="light"] {
+  --editor-bg: #fefefe;
+  --editor-text: #1f2937;
+  --editor-border: #e5e7eb;
+  --editor-line-number-bg: #f8fafc;
+  --editor-line-number-text: #64748b;
+  --editor-selection: #2563eb;
+  --editor-tag: #dc2626;
+  --editor-attribute: #059669;
+  --editor-string: #7c3aed;
+  --editor-comment: #64748b;
+  --editor-text-content: #334155;
+}
+
+/* Editor Wrapper */
+.html-editor-wrapper {
+  display: flex;
+  min-height: 200px;
+  max-height: 500px;
+  position: relative;
+}
+
+/* Line Numbers */
+.html-editor-line-numbers {
+  background: var(--editor-line-number-bg);
+  color: var(--editor-line-number-text);
+  padding: 8px 12px 8px 8px;
+  border-right: 1px solid var(--editor-border);
+  user-select: none;
+  overflow: hidden;
+  min-width: 40px;
+  text-align: right;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.html-editor-line-number {
+  white-space: nowrap;
+  height: 1.5em;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Editor Content Area */
+.html-editor-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Syntax Highlighting Layer */
+.html-editor-highlight-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 12px;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Text Area */
+.html-editor-textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  padding: 8px 12px;
+  margin: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--editor-text);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  resize: none;
+  z-index: 2;
+  caret-color: var(--editor-text);
+}
+
+.html-editor-textarea::placeholder {
+  color: var(--editor-line-number-text);
+  opacity: 0.7;
+}
+
+.html-editor-textarea:focus {
+  outline: none;
+}
+
+.html-editor-textarea::selection {
+  background: var(--editor-selection);
+  color: white;
+}
+
+/* Syntax Highlighting Styles */
+.html-editor-tag {
+  color: var(--editor-tag);
+  font-weight: 600;
+}
+
+.html-editor-attribute {
+  color: var(--editor-attribute);
+  font-weight: 500;
+}
+
+.html-editor-string {
+  color: var(--editor-string);
+}
+
+.html-editor-comment {
+  color: var(--editor-comment);
+  font-style: italic;
+}
+
+.html-editor-text {
+  color: var(--editor-text-content);
+}
+
+/* Scrollbar Styling */
+.html-editor-textarea::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.html-editor-textarea::-webkit-scrollbar-track {
+  background: var(--editor-line-number-bg);
+}
+
+.html-editor-textarea::-webkit-scrollbar-thumb {
+  background: var(--editor-line-number-text);
+  border-radius: 4px;
+}
+
+.html-editor-textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--editor-text);
+}
+
+/* Readonly State */
+.html-editor-container[data-readonly="true"] .html-editor-textarea {
+  cursor: default;
+  background: var(--editor-line-number-bg);
+}
+
+/* Focus State */
+.html-editor-container:focus-within {
+  border-color: var(--editor-selection);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .html-editor-line-numbers {
+    min-width: 35px;
+    padding: 8px 8px 8px 4px;
+  }
+  
+  .html-editor-textarea,
+  .html-editor-highlight-layer {
+    padding: 8px;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .html-editor-container {
+    --editor-border: #000000;
+    --editor-text: #000000;
+    --editor-bg: #ffffff;
+  }
+  
+  .html-editor-container[data-theme="dark"] {
+    --editor-border: #ffffff;
+    --editor-text: #ffffff;
+    --editor-bg: #000000;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .html-editor-container {
+    transition: none;
+  }
+}
