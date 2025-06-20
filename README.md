@@ -1,59 +1,234 @@
-# WitspryNgHtmlEditor
+# Witspry Angular HTML Editor
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.3.
+A simple, lightweight HTML editor component for Angular 20+ with syntax highlighting, line numbers, and auto-indentation features.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- ✅ **HTML Syntax Highlighting** - Real-time syntax highlighting for HTML tags, attributes, and content
+- ✅ **Line Numbers** - Optional line numbers with synchronized scrolling
+- ✅ **Auto-indentation** - Smart indentation based on HTML structure
+- ✅ **Multiple Themes** - Built-in Default, Light, and Dark themes
+- ✅ **Configurable** - Customizable tab size, font size, and editor behavior
+- ✅ **NgModel Support** - Full two-way data binding with Angular forms
+- ✅ **Standalone Component** - No additional dependencies required
+- ✅ **TypeScript** - Full TypeScript support with type definitions
+- ✅ **Responsive** - Mobile-friendly design
+- ✅ **Accessibility** - WCAG compliant with keyboard navigation support
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Installation
 
 ```bash
-ng generate --help
+npm install witspry-ng-html-editor
 ```
 
-## Building
+## Usage
 
-To build the project run:
+### Basic Usage
 
-```bash
-ng build
+```typescript
+import { Component } from '@angular/core';
+import { HtmlEditorComponent } from 'witspry-ng-html-editor';
+
+@Component({
+  selector: 'app-example',
+  standalone: true,
+  imports: [HtmlEditorComponent],
+  template: `
+    <witspry-html-editor
+      [(ngModel)]="htmlContent"
+      placeholder="Enter HTML content...">
+    </witspry-html-editor>
+  `
+})
+export class ExampleComponent {
+  htmlContent = '<div>Hello World</div>';
+}
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Advanced Usage
 
-## Running unit tests
+```typescript
+import { Component } from '@angular/core';
+import { HtmlEditorComponent, EditorConfig, ThemeType } from 'witspry-ng-html-editor';
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+@Component({
+  selector: 'app-advanced',
+  standalone: true,
+  imports: [HtmlEditorComponent],
+  template: `
+    <witspry-html-editor
+      [(ngModel)]="htmlContent"
+      [theme]="currentTheme"
+      [config]="editorConfig"
+      [readonly]="false"
+      placeholder="Enter HTML content..."
+      (contentChange)="onContentChange($event)"
+      (focus)="onEditorFocus()"
+      (blur)="onEditorBlur()">
+    </witspry-html-editor>
+  `
+})
+export class AdvancedComponent {
+  htmlContent = `<div class="container">
+  <h1>Welcome</h1>
+  <p>This is a sample HTML content.</p>
+</div>`;
 
-```bash
-ng test
+  currentTheme: ThemeType = 'dark';
+  
+  editorConfig: EditorConfig = {
+    tabSize: 2,
+    autoIndent: true,
+    lineNumbers: true,
+    wordWrap: false,
+    fontSize: '14px'
+  };
+
+  onContentChange(content: string): void {
+    console.log('Content changed:', content);
+  }
+
+  onEditorFocus(): void {
+    console.log('Editor focused');
+  }
+
+  onEditorBlur(): void {
+    console.log('Editor blurred');
+  }
+}
 ```
 
-## Running end-to-end tests
+## API Reference
 
-For end-to-end (e2e) testing, run:
+### Component Inputs
 
-```bash
-ng e2e
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `config` | `EditorConfig` | `defaultConfig` | Editor configuration options |
+| `theme` | `ThemeType` | `'default'` | Editor theme (`'default'` \| `'light'` \| `'dark'`) |
+| `readonly` | `boolean` | `false` | Whether the editor is read-only |
+| `placeholder` | `string` | `'Enter HTML content...'` | Placeholder text |
+
+### Component Outputs
+
+| Event | Type | Description |
+|-------|------|-------------|
+| `contentChange` | `EventEmitter<string>` | Emitted when content changes |
+| `focus` | `EventEmitter<void>` | Emitted when editor gains focus |
+| `blur` | `EventEmitter<void>` | Emitted when editor loses focus |
+
+### EditorConfig Interface
+
+```typescript
+interface EditorConfig {
+  tabSize: number;        // Number of spaces for tab (2, 4, or 8)
+  autoIndent: boolean;    // Enable auto-indentation
+  lineNumbers: boolean;   // Show line numbers
+  wordWrap: boolean;      // Enable word wrapping
+  fontSize: string;       // Font size (e.g., '14px', '16px')
+}
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Theme Types
 
-## Additional Resources
+```typescript
+type ThemeType = 'default' | 'light' | 'dark';
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Styling
+
+The component uses CSS custom properties for theming. You can customize the appearance by overriding these variables:
+
+```css
+witspry-html-editor {
+  --editor-bg: #ffffff;
+  --editor-text: #333333;
+  --editor-border: #d1d5db;
+  --editor-line-number-bg: #f9fafb;
+  --editor-line-number-text: #6b7280;
+  --editor-selection: #3b82f6;
+  --editor-tag: #dc2626;
+  --editor-attribute: #059669;
+  --editor-string: #7c3aed;
+  --editor-comment: #6b7280;
+  --editor-text-content: #374151;
+}
+```
+
+## Form Integration
+
+The component implements `ControlValueAccessor` and works seamlessly with Angular forms:
+
+### Template-driven Forms
+
+```typescript
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  imports: [FormsModule, HtmlEditorComponent],
+  template: `
+    <form #form="ngForm">
+      <witspry-html-editor
+        name="htmlContent"
+        [(ngModel)]="htmlContent"
+        required>
+      </witspry-html-editor>
+    </form>
+  `
+})
+export class FormComponent {
+  htmlContent = '';
+}
+```
+
+### Reactive Forms
+
+```typescript
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+@Component({
+  imports: [ReactiveFormsModule, HtmlEditorComponent],
+  template: `
+    <form [formGroup]="form">
+      <witspry-html-editor
+        formControlName="htmlContent">
+      </witspry-html-editor>
+    </form>
+  `
+})
+export class ReactiveFormComponent {
+  form: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.form = this.fb.group({
+      htmlContent: ['<div>Initial content</div>', Validators.required]
+    });
+  }
+}
+```
+
+## Browser Support
+
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Changelog
+
+### 1.0.0
+- Initial release
+- HTML syntax highlighting
+- Line numbers support
+- Auto-indentation
+- Multiple themes
+- NgModel integration
+- Standalone component architecture
