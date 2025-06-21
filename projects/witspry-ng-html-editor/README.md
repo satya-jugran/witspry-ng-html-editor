@@ -1,6 +1,6 @@
-# Witspry Angular HTML Editor
+# Angular HTML Editor
 
-A simple, lightweight HTML editor component for Angular 20+ with syntax highlighting, line numbers, and auto-indentation features.
+A simple, lightweight HTML editor component for Angular 19+ with syntax highlighting, line numbers, and auto-indentation features.
 
 ## Features
 

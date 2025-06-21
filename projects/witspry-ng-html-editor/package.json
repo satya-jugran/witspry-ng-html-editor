@@ -1,6 +1,6 @@
 {
   "name": "witspry-ng-html-editor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple HTML editor component for Angular with syntax highlighting, line numbers, and auto-indentation",
   "keywords": [
     "angular",
@@ -12,13 +12,13 @@
   ],
   "author": "Witspry",
   "license": "MIT",
-  "homepage": "https://github.com/witspry/witspry-ng-html-editor#readme",
+  "homepage": "https://github.com/satya-jugran/witspry-ng-html-editor#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/witspry/witspry-ng-html-editor.git"
+    "url": "https://github.com/satya-jugran/witspry-ng-html-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/witspry/witspry-ng-html-editor/issues"
+    "url": "https://github.com/satya-jugran/witspry-ng-html-editor/issues"
   },
   "main": "bundles/witspry-ng-html-editor.umd.js",
   "module": "fesm2022/witspry-ng-html-editor.mjs",
