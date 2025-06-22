@@ -97,7 +97,6 @@
   margin: 0;
   border: none;
   background: transparent;
-  color: transparent;
   font-family: inherit;
   font-size: inherit;
   line-height: 1.5;
@@ -122,7 +121,7 @@
   border: none;
   outline: none;
   background: transparent;
-  color: var(--editor-text);
+  color: transparent;
   font-family: inherit;
   font-size: inherit;
   line-height: 1.5;

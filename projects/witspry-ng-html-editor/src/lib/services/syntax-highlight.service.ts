@@ -1,10 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Token } from '../interfaces/editor-config.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SyntaxHighlightService {
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   highlightHtml(content: string): string {
     if (!content) return '';
@@ -42,18 +45,20 @@ export class SyntaxHighlightService {
           // Parse tag and attributes
           const tagMatch = tagContent.match(/^<\/?([a-zA-Z][a-zA-Z0-9]*)/);
           if (tagMatch) {
-            // Tag name
+            let currentIndex = index;
+            
+            // Opening bracket and tag name
             tokens.push({
               type: 'tag',
               value: tagMatch[0],
-              startIndex: index,
-              endIndex: index + tagMatch[0].length
+              startIndex: currentIndex,
+              endIndex: currentIndex + tagMatch[0].length
             });
+            currentIndex += tagMatch[0].length;
 
             // Parse attributes
             const attributeRegex = /\s+([a-zA-Z][a-zA-Z0-9-]*)\s*=\s*("[^"]*"|'[^']*'|[^\s>]*)/g;
             let attrMatch;
-            let lastIndex = index + tagMatch[0].length;
 
             while ((attrMatch = attributeRegex.exec(tagContent)) !== null) {
               const attrStartIndex = index + attrMatch.index;
@@ -74,6 +79,14 @@ export class SyntaxHighlightService {
                 endIndex: attrStartIndex + attrMatch[0].indexOf(attrMatch[2]) + attrMatch[2].length
               });
             }
+            
+            // Closing bracket
+            tokens.push({
+              type: 'tag',
+              value: '>',
+              startIndex: tagEndIndex,
+              endIndex: tagEndIndex + 1
+            });
           }
 
           index = tagEndIndex + 1;
@@ -114,11 +127,11 @@ export class SyntaxHighlightService {
     for (const token of tokens) {
       // Add any content between tokens
       if (token.startIndex > lastIndex) {
-        result += this.escapeHtml(originalContent.substring(lastIndex, token.startIndex));
+        result += this.escapeHtmlPreservingContent(originalContent.substring(lastIndex, token.startIndex));
       }
 
       // Add highlighted token
-      const escapedValue = this.escapeHtml(token.value);
+      const escapedValue = this.escapeHtmlPreservingContent(token.value);
       result += `<span class="html-editor-${token.type}">${escapedValue}</span>`;
       
       lastIndex = token.endIndex;
@@ -126,15 +139,37 @@ export class SyntaxHighlightService {
 
     // Add remaining content
     if (lastIndex < originalContent.length) {
-      result += this.escapeHtml(originalContent.substring(lastIndex));
+      result += this.escapeHtmlPreservingContent(originalContent.substring(lastIndex));
     }
 
     return result;
   }
 
   private escapeHtml(text: string): string {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    if (isPlatformBrowser(this.platformId)) {
+      // Use DOM method in browser
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    } else {
+      // Manual escaping for SSR
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  }
+
+  private escapeHtmlPreservingContent(text: string): string {
+    // For syntax highlighting, we need to escape HTML properly to prevent it from being interpreted
+    // but we want to preserve the original content structure for display
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { HtmlEditorComponent } from '../../../witspry-ng-html-editor/src/lib/components/html-editor/html-editor.component';
 import { EditorConfig, ThemeType } from '../../../witspry-ng-html-editor/src/lib/interfaces/editor-config.interface';
 
@@ -40,6 +41,12 @@ export class AppComponent {
     { value: 'light', label: 'Light' },
     { value: 'dark', label: 'Dark' }
   ];
+
+  constructor(private sanitizer: DomSanitizer) {}
+
+  get safeHtmlContent(): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(this.htmlContent);
+  }
 
   onContentChange(content: string): void {
     console.log('Content changed:', content);

@@ -1,17 +1,21 @@
-import { 
-  Component, 
-  Input, 
-  Output, 
-  EventEmitter, 
-  forwardRef, 
-  ElementRef, 
-  ViewChild, 
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  forwardRef,
+  ElementRef,
+  ViewChild,
   AfterViewInit,
   OnDestroy,
   ChangeDetectorRef,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
+  ViewEncapsulation,
+  Inject,
+  PLATFORM_ID
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { EditorConfig, ThemeType } from '../../interfaces/editor-config.interface';
@@ -22,6 +26,7 @@ import { EditorConfigService } from '../../services/editor-config.service';
   selector: 'witspry-html-editor',
   standalone: true,
   imports: [CommonModule],
+  encapsulation: ViewEncapsulation.None,
   template: `
     <div class="html-editor-container" [attr.data-theme]="theme">
       <div class="html-editor-wrapper">
@@ -40,10 +45,10 @@ import { EditorConfigService } from '../../services/editor-config.service';
         <!-- Editor Content -->
         <div class="html-editor-content">
           <!-- Syntax Highlighted Background -->
-          <div 
+          <div
+            #highlightLayer
             class="html-editor-highlight-layer"
-            [style.font-size]="config.fontSize"
-            [innerHTML]="highlightedContent">
+            [style.font-size]="config.fontSize">
           </div>
           
           <!-- Editable Text Area -->
@@ -95,10 +100,11 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
   @Output() blur = new EventEmitter<void>();
 
   @ViewChild('editorTextarea', { static: false }) editorTextarea!: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('highlightLayer', { static: false }) highlightLayer!: ElementRef<HTMLDivElement>;
 
   value: string = '';
-  highlightedContent: string = '';
   lineNumbers: number[] = [];
+  private pendingHighlightUpdate = false;
   
   private onChange = (value: string) => {};
   private onTouched = () => {};
@@ -107,7 +113,8 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
   constructor(
     private syntaxHighlightService: SyntaxHighlightService,
     private editorConfigService: EditorConfigService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -122,8 +129,43 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
   }
 
   ngAfterViewInit(): void {
+    // Ensure highlighting is applied after ViewChild is ready
+    if (isPlatformBrowser(this.platformId)) {
+      // Use requestAnimationFrame in browser to ensure DOM is fully rendered
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          this.applyInitialHighlighting();
+        }, 50);
+      });
+    } else {
+      // Fallback for SSR
+      setTimeout(() => {
+        this.applyInitialHighlighting();
+      }, 100);
+    }
+  }
+
+  private applyInitialHighlighting(): void {
+    // Force update highlighting for any existing content
     this.updateHighlighting();
     this.updateLineNumbers();
+    // Force change detection to ensure the view is updated
+    this.cdr.detectChanges();
+    
+    // If there was a pending highlight update, apply it now
+    if (this.pendingHighlightUpdate) {
+      this.pendingHighlightUpdate = false;
+      this.updateHighlighting();
+      this.cdr.detectChanges();
+    }
+    
+    // Force a repaint of the highlight layer to ensure visibility
+    this.forceHighlightLayerRepaint();
+    
+    // Additional delay to ensure everything is rendered
+    setTimeout(() => {
+      this.forceHighlightLayerRepaint();
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -133,7 +175,10 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
   // ControlValueAccessor implementation
   writeValue(value: any): void {
     this.value = value || '';
-    this.updateHighlighting();
+    // Try to update highlighting, but mark as pending if ViewChild isn't ready
+    if (!this.updateHighlighting()) {
+      this.pendingHighlightUpdate = true;
+    }
     this.updateLineNumbers();
     this.cdr.detectChanges();
   }
@@ -215,8 +260,33 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
   }
 
   // Helper methods
-  private updateHighlighting(): void {
-    this.highlightedContent = this.syntaxHighlightService.highlightHtml(this.value);
+  private updateHighlighting(): boolean {
+    if (this.highlightLayer && this.highlightLayer.nativeElement) {
+      const rawHighlightedContent = this.syntaxHighlightService.highlightHtml(this.value);
+      // Use direct DOM manipulation to avoid Angular's sanitization
+      this.highlightLayer.nativeElement.innerHTML = rawHighlightedContent;
+      return true;
+    }
+    // Return false if ViewChild is not ready yet
+    return false;
+  }
+
+  private forceHighlightLayerRepaint(): void {
+    if (this.highlightLayer && this.highlightLayer.nativeElement) {
+      const element = this.highlightLayer.nativeElement;
+      // Force a repaint by temporarily changing and restoring a style property
+      const originalDisplay = element.style.display;
+      element.style.display = 'none';
+      // Force a reflow
+      element.offsetHeight;
+      element.style.display = originalDisplay || '';
+      
+      // Also ensure the content is properly set
+      if (this.value) {
+        const rawHighlightedContent = this.syntaxHighlightService.highlightHtml(this.value);
+        element.innerHTML = rawHighlightedContent;
+      }
+    }
   }
 
   private updateLineNumbers(): void {
