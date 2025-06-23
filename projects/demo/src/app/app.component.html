@@ -32,6 +32,18 @@
     </div>
 
     <div class="control-group">
+      <label for="height-select">Height:</label>
+      <select id="height-select" [(ngModel)]="editorHeight">
+        <option value="150px">150px</option>
+        <option value="200px">200px</option>
+        <option value="300px">300px</option>
+        <option value="400px">400px</option>
+        <option value="500px">500px</option>
+        <option value="600px">600px</option>
+      </select>
+    </div>
+
+    <div class="control-group">
       <label>
         <input type="checkbox" [checked]="editorConfig.lineNumbers" (change)="toggleLineNumbers()">
         Line Numbers
@@ -67,6 +79,7 @@
       [theme]="currentTheme"
       [config]="editorConfig"
       [readonly]="readonly"
+      [height]="editorHeight"
       placeholder="Enter your HTML content here..."
       (contentChange)="onContentChange($event)"
       (focus)="onEditorFocus()"
@@ -93,6 +106,7 @@
       <li>✅ Multiple Themes (Default, Light, Dark)</li>
       <li>✅ Configurable Tab Size</li>
       <li>✅ Configurable Font Size</li>
+      <li>✅ Configurable Height with Scrolling</li>
       <li>✅ Word Wrap Support</li>
       <li>✅ Read-only Mode</li>
       <li>✅ NgModel Integration</li>
@@ -107,6 +121,7 @@
   [theme]="'dark'"
   [config]="editorConfig"
   [readonly]="false"
+  [height]="'300px'"
   placeholder="Enter HTML content..."
   (contentChange)="onContentChange($event)"
   (focus)="onEditorFocus()"

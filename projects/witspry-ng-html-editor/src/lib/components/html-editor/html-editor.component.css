@@ -52,9 +52,8 @@
 /* Editor Wrapper */
 .html-editor-wrapper {
   display: flex;
-  min-height: 200px;
-  max-height: 500px;
   position: relative;
+  overflow: hidden;
 }
 
 /* Line Numbers */
@@ -69,6 +68,7 @@
   text-align: right;
   line-height: 1.5;
   font-size: 14px;
+  flex-shrink: 0;
 }
 
 .html-editor-line-number {
@@ -84,9 +84,34 @@
   flex: 1;
   position: relative;
   overflow: hidden;
+  min-height: 0; /* Allow flex item to shrink */
 }
 
-/* Syntax Highlighting Layer */
+/* Text Area - Primary scrollable element */
+.html-editor-textarea {
+  width: 100%;
+  height: 100%;
+  padding: 8px 12px;
+  margin: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  resize: none;
+  overflow-y: scroll;
+  overflow-x: auto;
+  z-index: 2;
+  caret-color: var(--editor-text);
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Syntax Highlighting Layer - Positioned over textarea */
 .html-editor-highlight-layer {
   position: absolute;
   top: 0;
@@ -105,31 +130,7 @@
   overflow: hidden;
   pointer-events: none;
   z-index: 1;
-}
-
-/* Text Area */
-.html-editor-textarea {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  padding: 8px 12px;
-  margin: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: transparent;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  resize: none;
-  z-index: 2;
-  caret-color: var(--editor-text);
+  box-sizing: border-box;
 }
 
 .html-editor-textarea::placeholder {
@@ -170,23 +171,43 @@
   color: var(--editor-text-content);
 }
 
-/* Scrollbar Styling */
+/* Scrollbar Styling - Force visibility */
 .html-editor-textarea::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 14px;
+  height: 14px;
+  background: var(--editor-line-number-bg);
 }
 
 .html-editor-textarea::-webkit-scrollbar-track {
   background: var(--editor-line-number-bg);
+  border-radius: 7px;
+  border: 1px solid var(--editor-border);
 }
 
 .html-editor-textarea::-webkit-scrollbar-thumb {
-  background: var(--editor-line-number-text);
-  border-radius: 4px;
+  background: var(--editor-text);
+  border-radius: 7px;
+  border: 2px solid var(--editor-line-number-bg);
+  min-height: 30px;
 }
 
 .html-editor-textarea::-webkit-scrollbar-thumb:hover {
-  background: var(--editor-text);
+  background: var(--editor-selection);
+  border-color: var(--editor-border);
+}
+
+.html-editor-textarea::-webkit-scrollbar-thumb:active {
+  background: var(--editor-selection);
+}
+
+.html-editor-textarea::-webkit-scrollbar-corner {
+  background: var(--editor-line-number-bg);
+}
+
+/* Force scrollbar to always be visible */
+.html-editor-textarea {
+  scrollbar-width: thin;
+  scrollbar-color: var(--editor-text) var(--editor-line-number-bg);
 }
 
 /* Readonly State */

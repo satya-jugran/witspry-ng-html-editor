@@ -29,14 +29,15 @@ import { EditorConfigService } from '../../services/editor-config.service';
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="html-editor-container" [attr.data-theme]="theme">
-      <div class="html-editor-wrapper">
+      <div class="html-editor-wrapper" [style.height]="height">
         <!-- Line Numbers -->
-        <div 
-          *ngIf="config.lineNumbers" 
+        <div
+          #lineNumbersContainer
+          *ngIf="config.lineNumbers"
           class="html-editor-line-numbers"
           [style.font-size]="config.fontSize">
-          <div 
-            *ngFor="let lineNumber of lineNumbers; trackBy: trackByLineNumber" 
+          <div
+            *ngFor="let lineNumber of lineNumbers; trackBy: trackByLineNumber"
             class="html-editor-line-number">
             {{ lineNumber }}
           </div>
@@ -94,6 +95,7 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
   @Input() theme: ThemeType = 'default';
   @Input() readonly: boolean = false;
   @Input() placeholder: string = 'Enter HTML content...';
+  @Input() height: string = '200px';
 
   @Output() contentChange = new EventEmitter<string>();
   @Output() focus = new EventEmitter<void>();
@@ -101,6 +103,7 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
 
   @ViewChild('editorTextarea', { static: false }) editorTextarea!: ElementRef<HTMLTextAreaElement>;
   @ViewChild('highlightLayer', { static: false }) highlightLayer!: ElementRef<HTMLDivElement>;
+  @ViewChild('lineNumbersContainer', { static: false }) lineNumbersElement!: ElementRef<HTMLDivElement>;
 
   value: string = '';
   lineNumbers: number[] = [];
@@ -245,17 +248,17 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
   }
 
   handleScroll(event: Event): void {
-    const target = event.target as HTMLTextAreaElement;
-    const highlightLayer = target.parentElement?.querySelector('.html-editor-highlight-layer') as HTMLElement;
-    const lineNumbers = target.parentElement?.parentElement?.querySelector('.html-editor-line-numbers') as HTMLElement;
+    const textarea = event.target as HTMLTextAreaElement;
     
-    if (highlightLayer) {
-      highlightLayer.scrollTop = target.scrollTop;
-      highlightLayer.scrollLeft = target.scrollLeft;
+    // Synchronize highlight layer with textarea scroll
+    if (this.highlightLayer && this.highlightLayer.nativeElement) {
+      this.highlightLayer.nativeElement.scrollTop = textarea.scrollTop;
+      this.highlightLayer.nativeElement.scrollLeft = textarea.scrollLeft;
     }
     
-    if (lineNumbers) {
-      lineNumbers.scrollTop = target.scrollTop;
+    // Synchronize line numbers with textarea scroll
+    if (this.lineNumbersElement && this.lineNumbersElement.nativeElement) {
+      this.lineNumbersElement.nativeElement.scrollTop = textarea.scrollTop;
     }
   }
 

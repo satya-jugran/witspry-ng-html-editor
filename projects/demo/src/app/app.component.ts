@@ -19,10 +19,27 @@ export class AppComponent {
   <h1>Welcome to HTML Editor</h1>
   <p>This is a sample HTML content with <strong>bold text</strong> and <em>italic text</em>.</p>
   <!-- This is a comment -->
-  <ul>
-    <li>First item</li>
-    <li>Second item</li>
-  </ul>
+  <section class="additional-content">
+    <h2>More Content</h2>
+    <p>Additional content to test scrolling functionality.</p>
+    <ul>
+      <li>First item</li>
+      <li>Second item</li>
+      <li>Third item</li>
+      <li>Fourth item</li>
+      <li>Fifth item</li>
+    </ul>
+    <div class="nested">
+      <h3>Nested Section</h3>
+      <p>Footer content with <span style="color:green;">styled text</span></p>
+      <ul>
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+        <li>Item 4</li>
+      </ul>
+    </div>
+  </section>
 </div>`;
 
   editorConfig: EditorConfig = {
@@ -35,6 +52,7 @@ export class AppComponent {
 
   currentTheme: ThemeType = 'dark';
   readonly = false;
+  editorHeight = '300px';
 
   themes: { value: ThemeType; label: string }[] = [
     { value: 'default', label: 'Default' },
@@ -86,5 +104,9 @@ export class AppComponent {
 
   changeFontSize(size: string): void {
     this.editorConfig = { ...this.editorConfig, fontSize: size };
+  }
+
+  changeHeight(height: string): void {
+    this.editorHeight = height;
   }
 }
