@@ -239,3 +239,6 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 ### 1.1.0
 - Added height as an input parameter.
 - Added scrolling if content is larger than height given in input parameter
+
+## 1.1.1
+- Fixed word wrap and line number issues
