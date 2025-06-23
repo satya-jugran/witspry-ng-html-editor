@@ -1,6 +1,6 @@
 {
   "name": "witspry-ng-html-editor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple Angular HTML editor with server-side rendering support.",
   "author": "Satya Jugran <satya.jugran@gmail.com>",
   "license": "MIT",

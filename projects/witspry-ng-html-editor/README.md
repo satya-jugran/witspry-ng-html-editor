@@ -232,3 +232,6 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 - Multiple themes
 - NgModel integration
 - Standalone component architecture
+
+### 1.0.2
+- Syntax highlighting fixes and improvements
