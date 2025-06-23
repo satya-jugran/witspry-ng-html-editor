@@ -49,7 +49,9 @@ import { EditorConfigService } from '../../services/editor-config.service';
           <div
             #highlightLayer
             class="html-editor-highlight-layer"
-            [style.font-size]="config.fontSize">
+            [style.font-size]="config.fontSize"
+            [style.white-space]="config.wordWrap ? 'pre-wrap' : 'pre'"
+            [style.word-wrap]="config.wordWrap ? 'break-word' : 'normal'">
           </div>
           
           <!-- Editable Text Area -->
@@ -58,6 +60,9 @@ import { EditorConfigService } from '../../services/editor-config.service';
             class="html-editor-textarea"
             [style.font-size]="config.fontSize"
             [style.tab-size]="config.tabSize"
+            [style.white-space]="config.wordWrap ? 'pre-wrap' : 'pre'"
+            [style.word-wrap]="config.wordWrap ? 'break-word' : 'normal'"
+            [style.overflow-x]="config.wordWrap ? 'hidden' : 'auto'"
             [placeholder]="placeholder"
             [readonly]="readonly"
             [value]="value"
@@ -107,7 +112,9 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
 
   value: string = '';
   lineNumbers: number[] = [];
+  lineHeights: number[] = [];
   private pendingHighlightUpdate = false;
+  private resizeObserver?: ResizeObserver;
   
   private onChange = (value: string) => {};
   private onTouched = () => {};
@@ -123,6 +130,14 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['config']) {
       this.config = this.editorConfigService.mergeWithDefaults(this.config);
+      
+      // If word wrap setting changed, recalculate line heights
+      if (changes['config'].previousValue &&
+          changes['config'].previousValue.wordWrap !== this.config.wordWrap) {
+        setTimeout(() => {
+          this.calculateLineHeights();
+        }, 0);
+      }
     }
     
     if (changes['value'] || changes['config']) {
@@ -138,6 +153,7 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
       requestAnimationFrame(() => {
         setTimeout(() => {
           this.applyInitialHighlighting();
+          this.setupResizeObserver();
         }, 50);
       });
     } else {
@@ -172,7 +188,10 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
   }
 
   ngOnDestroy(): void {
-    // Cleanup if needed
+    // Cleanup resize observer
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 
   // ControlValueAccessor implementation
@@ -295,6 +314,100 @@ export class HtmlEditorComponent implements ControlValueAccessor, AfterViewInit,
   private updateLineNumbers(): void {
     const lines = this.value.split('\n').length;
     this.lineNumbers = Array.from({ length: lines }, (_, i) => i + 1);
+    
+    // Calculate line heights after DOM update
+    setTimeout(() => {
+      this.calculateLineHeights();
+    }, 0);
+  }
+
+  private calculateLineHeights(): void {
+    if (!this.editorTextarea?.nativeElement || !isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const textarea = this.editorTextarea.nativeElement;
+    const lines = this.value.split('\n');
+    this.lineHeights = [];
+
+    // If word wrap is disabled, all lines have the same height
+    if (!this.config.wordWrap) {
+      const computedStyle = getComputedStyle(textarea);
+      const lineHeight = parseFloat(computedStyle.lineHeight) || parseFloat(computedStyle.fontSize) * 1.5;
+      
+      for (let i = 0; i < lines.length; i++) {
+        this.lineHeights.push(lineHeight);
+      }
+      
+      this.updateLineNumberHeights();
+      return;
+    }
+
+    // For word wrap enabled, calculate dynamic heights
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.visibility = 'hidden';
+    tempDiv.style.height = 'auto';
+    tempDiv.style.width = textarea.clientWidth - 24 + 'px'; // Account for padding
+    tempDiv.style.padding = '0';
+    tempDiv.style.margin = '0';
+    tempDiv.style.border = 'none';
+    tempDiv.style.fontFamily = getComputedStyle(textarea).fontFamily;
+    tempDiv.style.fontSize = getComputedStyle(textarea).fontSize;
+    tempDiv.style.lineHeight = getComputedStyle(textarea).lineHeight;
+    tempDiv.style.whiteSpace = 'pre-wrap';
+    tempDiv.style.wordWrap = 'break-word';
+    tempDiv.style.overflow = 'hidden';
+
+    document.body.appendChild(tempDiv);
+
+    try {
+      for (let i = 0; i < lines.length; i++) {
+        const lineContent = lines[i] || ' '; // Use space for empty lines
+        tempDiv.textContent = lineContent;
+        const height = tempDiv.offsetHeight;
+        this.lineHeights.push(height);
+      }
+    } finally {
+      document.body.removeChild(tempDiv);
+    }
+
+    // Update line number container heights
+    this.updateLineNumberHeights();
+  }
+
+  private updateLineNumberHeights(): void {
+    if (!this.lineNumbersElement?.nativeElement || !isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const lineNumberElements = this.lineNumbersElement.nativeElement.querySelectorAll('.html-editor-line-number');
+    
+    lineNumberElements.forEach((element: Element, index: number) => {
+      if (this.lineHeights[index]) {
+        (element as HTMLElement).style.height = this.lineHeights[index] + 'px';
+        (element as HTMLElement).style.minHeight = this.lineHeights[index] + 'px';
+      }
+    });
+  }
+
+  private setupResizeObserver(): void {
+    if (!isPlatformBrowser(this.platformId) || !this.editorTextarea?.nativeElement) {
+      return;
+    }
+
+    // Create ResizeObserver to watch for textarea size changes
+    this.resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // Debounce the recalculation to avoid excessive calls
+        setTimeout(() => {
+          this.calculateLineHeights();
+        }, 100);
+      }
+    });
+
+    // Observe the textarea for size changes
+    this.resizeObserver.observe(this.editorTextarea.nativeElement);
   }
 
   private insertTab(isShiftTab: boolean): void {
