@@ -50,6 +50,7 @@ import { EditorConfigService } from '../../services/editor-config.service';
             #highlightLayer
             class="html-editor-highlight-layer"
             [style.font-size]="config.fontSize"
+            [style.tab-size]="config.tabSize"
             [style.white-space]="config.wordWrap ? 'pre-wrap' : 'pre'"
             [style.word-wrap]="config.wordWrap ? 'break-word' : 'normal'">
           </div>

@@ -318,3 +318,6 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ### 1.2.0
 - Updated Angular dependencies to Angular v21
+
+### 1.2.1
+- Fix tab space and highlighting issue

@@ -147,12 +147,10 @@
 /* Syntax Highlighting Styles */
 .html-editor-tag {
   color: var(--editor-tag);
-  font-weight: 600;
 }
 
 .html-editor-attribute {
   color: var(--editor-attribute);
-  font-weight: 500;
 }
 
 .html-editor-string {
@@ -161,7 +159,6 @@
 
 .html-editor-comment {
   color: var(--editor-comment);
-  font-style: italic;
 }
 
 .html-editor-text {
