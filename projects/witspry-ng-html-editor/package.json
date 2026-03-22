@@ -1,6 +1,6 @@
 {
   "name": "witspry-ng-html-editor",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "A simple HTML editor component for Angular with syntax highlighting, line numbers, and auto-indentation",
   "keywords": [
     "angular",
@@ -24,9 +24,9 @@
   "module": "fesm2022/witspry-ng-html-editor.mjs",
   "typings": "index.d.ts",
   "peerDependencies": {
-    "@angular/common": "^19.0.0",
-    "@angular/core": "^19.0.0",
-    "@angular/forms": "^19.0.0"
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

@@ -27,18 +27,16 @@ const commonEngine = new CommonEngine();
 /**
  * Serve static files from /browser
  */
-app.get(
-  '**',
-  express.static(browserDistFolder, {
-    maxAge: '1y',
-    index: 'index.html'
-  }),
-);
+app.use(express.static(browserDistFolder, {
+  maxAge: '1y',
+  index: 'index.html'
+}));
 
 /**
  * Handle all other requests by rendering the Angular application.
+ * Using a middleware function for Express 5 compatibility
  */
-app.get('**', (req, res, next) => {
+app.use((req, res, next) => {
   const { protocol, originalUrl, baseUrl, headers } = req;
 
   commonEngine

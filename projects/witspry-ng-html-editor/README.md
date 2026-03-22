@@ -1,6 +1,6 @@
 # Angular HTML Editor
 
-A simple, lightweight HTML editor component for Angular 19+ with syntax highlighting, line numbers, and auto-indentation features.
+A simple, lightweight HTML editor component for Angular 20+ with syntax highlighting, line numbers, and auto-indentation features.
 
 ## Features
 
@@ -19,6 +19,79 @@ A simple, lightweight HTML editor component for Angular 19+ with syntax highligh
 
 ```bash
 npm install witspry-ng-html-editor
+```
+
+## Development
+
+### Prerequisites
+
+- Node.js 18+
+- npm 9+
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Build Commands
+
+Build the demo application:
+```bash
+npm run build
+```
+
+Build the library only:
+```bash
+ng build witspry-ng-html-editor
+```
+
+Build the demo application explicitly:
+```bash
+ng build demo
+```
+
+### Running the Demo
+
+Start the development server (client-side):
+```bash
+npm start
+```
+
+This will start the demo application at `http://localhost:4200`.
+
+Start the SSR server:
+```bash
+npm run serve:ssr:demo
+```
+
+This will start the SSR server at `http://localhost:4000`.
+
+### Publishing to npm
+
+1. Build the library:
+```bash
+ng build witspry-ng-html-editor
+```
+
+2. Navigate to the dist folder:
+```bash
+cd dist/witspry-ng-html-editor
+```
+
+3. Login to npm (if not already):
+```bash
+npm login
+```
+
+4. Publish the package:
+```bash
+npm publish
+```
+
+Alternatively, you can publish directly from the root:
+```bash
+npm run build && cd dist/witspry-ng-html-editor && npm publish
 ```
 
 ## Usage
@@ -242,3 +315,6 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ### 1.1.1
 - Fixed word wrap and line number issues
+
+### 1.2.0
+- Updated Angular dependencies to Angular v21
